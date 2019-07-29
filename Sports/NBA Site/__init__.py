@@ -1,18 +1,23 @@
 from flask import Flask
 from flask import render_template
 
-import nba_py
+import nba_py as nba
 from datetime import datetime
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def index():
-    render_template('index.html',
-    title='Daily Scores')
+    get_games()
+    return render_template("index.html",
+            title="Daily Scores")
 
-if __name__=="__main__":
-    app.run(host="0.0.0.0", port = '8080', threaded = True, debug = True)
+def get_games():
+    scoreboard = nba.Scoreboard()
+    print(scoreboard.line_score())
+
+if __name__=="__main__": 
+    app.run(host="0.0.0.0", port = 8080, threaded = True, debug = True)
 
 
 
