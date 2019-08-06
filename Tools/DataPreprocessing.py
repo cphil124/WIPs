@@ -7,7 +7,7 @@ from pandas import DataFrame
 
 class DataTransformer(object):
     
-    def __init__(self, dataset):
+    def __init__(self, dataset=None):
         self.raw_data = None
         if dataset:
             self.raw_data = dataset
@@ -42,7 +42,7 @@ class DataTransformer(object):
 
     def addTransformedCol(self, trans_func, *cols):
         col, header = exec(f'{trans_func}({cols})')
-        addColumn_(col, header)
+        self.addColumn_(col, header)
 
 
 x = DataTransformer()
