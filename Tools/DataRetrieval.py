@@ -5,6 +5,8 @@ import tarfile
 
 DEFAULT_DIRECTORY = 'data/raw_data'
 
+FILETYPE_LIB = ['tgz', 'csv']
+
 
 class WebDataFetcher(object):
     """
@@ -24,23 +26,40 @@ class WebDataFetcher(object):
         if not os.path.isdir(save_path):
             os.makedirs(save_path)
         
+        # get_file_type(
         # Code to check for type of download file and adapt file extension accordingly goes here
         tgz_path = os.path.join(save_path, (save_name + '.tgz'))
         x = requests.get(data_url, allow_redirects=True)
         open(tgz_path, 'wb').write(x.content)
         self.data_file = os.path.abspath(tgz_path)
+        # self.
         print(self.data_file)
     
     def attrs(self):
+        """
+        See all attributes of the object and their types
+        """
         for var in vars(self):
             print(var, ' ; type: ', type(vars(self)[var]), ' : ', vars(self)[var])
 
-    def get_file_type(self):
-        print(self.data_file[-6:])
+    def get_file_type(self, file):
+        if file:
+            extension = file[-6:].split('.')[1]
+        else:
+            extension = self.data_file[-6:].split('.')[1]
+        if extension in FILETYPE_LIB:
+            return extension
+        else:
+            print('This filetype handling not supported at present')
+            return None
+
+
         
         
     def extract_tgz_(self):
-        data_tgz = self.data_file
+        # if self.file_type is tgz
+        tgz_path = self.data_file
+        save_path = self.data_dir
         data_tgz = tarfile.open(tgz_path)
         data_tgz.extractall(path=save_path)
         data_tgz.close()
@@ -52,5 +71,6 @@ TEST_URL = 'https://raw.githubusercontent.com/ageron/handson-ml2/master/datasets
 
 
 fetcher = WebDataFetcher()
-fetcher.fetch(data_url = TEST_URL)
-get_file_type()
+# fetcher.fetch(data_url = TEST_URL)
+x = fetcher.get_file_type(file='target.tgz')
+print(x)
