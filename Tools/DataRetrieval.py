@@ -2,6 +2,7 @@
 import os
 import requests
 import tarfile
+import sys
 
 DEFAULT_DIRECTORY = 'data/raw_data'
 
@@ -13,8 +14,8 @@ class WebDataFetcher(object):
     Class to fetch and handle the file-type processing to get the data ready for use
     """
 
-    def __init__(self, data_dir = DEFAULT_DIRECTORY):
-        self.data_dir = DEFAULT_DIRECTORY
+    def __init__(self):
+        self.data_dir = ''
         self.data_file = ''
         self.file_type = '' # To keep track of the type of file. Can make disparate format specific functions and then add aggregate functions to determine type and apply accordingly
 
@@ -23,15 +24,22 @@ class WebDataFetcher(object):
         """
         Method to download data from a specified url, and save it in a specified path
         """
+        # Runs get_file_type on the incoming data to confirm that it is a supported filetype.  If it is, then it will set the class attribute file_type for later reference. 
+        # If it is not, then it it will exit the program.
+        self.file_type = self.get_file_type(file=data_url)
+
+        # Create the save dir if it doesn't exist and add it to the instance attributes
         if not os.path.isdir(save_path):
             os.makedirs(save_path)
         
+        self.data_dir = save_path
+        
         # get_file_type(
         # Code to check for type of download file and adapt file extension accordingly goes here
-        tgz_path = os.path.join(save_path, (save_name + '.tgz'))
+        file_path = os.path.join(save_path, (save_name + '.' + self.file_type))
         x = requests.get(data_url, allow_redirects=True)
-        open(tgz_path, 'wb').write(x.content)
-        self.data_file = os.path.abspath(tgz_path)
+        open(file_path, 'wb').write(x.content)
+        self.data_file = os.path.abspath(file_path)
         # self.
         print(self.data_file)
     
@@ -44,19 +52,25 @@ class WebDataFetcher(object):
 
     def get_file_type(self, file):
         if file:
-            extension = file[-6:].split('.')[1]
+            data = file
         else:
-            extension = self.data_file[-6:].split('.')[1]
+            data = self.data_file
+
+        extension = data[-6:].split('.')[1]
+
         if extension in FILETYPE_LIB:
             return extension
         else:
             print('This filetype handling not supported at present')
-            return None
+            sys.exit(1)
 
 
         
         
     def extract_tgz_(self):
+        """
+        Right now only handles tgz files, should change so that it can dynamically extra
+        """
         # if self.file_type is tgz
         tgz_path = self.data_file
         save_path = self.data_dir
