@@ -45,7 +45,10 @@ class DataTransformer(object):
         self.addColumn_(col, header)
 
 
-x = DataTransformer()
+def combine_labels(labs_a, labs_b):
+    new_lab = np.c_[np.array(labs_a), np.array(labs_b)]
+    return new_lab
+
 
 
 
